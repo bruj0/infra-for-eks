@@ -52,6 +52,10 @@ variable "node_min_size" {
   default     = 1
 }
 
+
+
+
+
 variable "tags" {
   description = "A map of tags to add to all resources"
   type        = map(string)

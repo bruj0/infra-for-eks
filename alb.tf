@@ -86,7 +86,10 @@ resource "kubernetes_service_account" "aws_load_balancer_controller" {
     }
   }
 
-  depends_on = [module.eks]
+  depends_on = [
+    module.eks,
+    module.load_balancer_controller_irsa_role
+  ]
 }
 
 # AWS Load Balancer Controller Helm Chart

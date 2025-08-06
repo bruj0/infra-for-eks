@@ -1,3 +1,16 @@
+# Dynamic AMI fetching using Terraform data sources
+# data "aws_ssm_parameter" "eks_ami_release_version" {
+#   name = "/aws/service/eks/optimized-ami/${var.cluster_version}/amazon-linux-2/recommended/release_version"
+# }
+# data "aws_ssm_parameter" "eks_ami_image_id" {
+#   name = "/aws/service/eks/optimized-ami/${var.cluster_version}/amazon-linux-2/recommended/image_id"
+# }
+# ami_id = data.aws_ssm_parameter.eks_ami_image_id.value
+# aws ssm get-parameters-by-path \
+#   --path /aws/service/eks/optimized-ami \
+#   --query 'Parameters[?contains(Name, `amazon-linux-2/recommended/image_id`)].Name' \
+#   --region eu-north-1
+
 # EKS Cluster
 module "eks" {
   source = "terraform-aws-modules/eks/aws"
@@ -42,8 +55,11 @@ module "eks" {
       max_size     = var.node_max_size
       desired_size = var.node_desired_size
 
+
+
       # Use the latest EKS optimized AMI
-      ami_type = "AL2_x86_64"
+      ami_type = "AL2_x86_64"  # Previous generic AMI type
+      #ami_id = "ami-06396cf1b09f14a4e"  # Latest EKS-optimized AMI for K8s 1.30 in eu-north-1
       
       # Disk configuration
       block_device_mappings = {

@@ -88,7 +88,7 @@ resource "kubernetes_config_map" "sample_app_config" {
       </head>
       <body>
           <div class="container">
-              <h1 class="success">🎉 EKS Cluster is Running!</h1>
+              <h1 class="success">EKS Cluster is Running!</h1>
               <p>This is a sample application running on your minimal EKS cluster.</p>
               <p>AWS Load Balancer Controller is working correctly.</p>
               <hr>
