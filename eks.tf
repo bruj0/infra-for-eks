@@ -97,6 +97,74 @@ module "eks" {
   tags = var.tags
 }
 
+# EKS Container Insights addon for enhanced monitoring
+resource "aws_eks_addon" "container_insights" {
+  count = var.enable_container_insights ? 1 : 0
+  
+  cluster_name                = module.eks.cluster_name
+  addon_name                  = "amazon-cloudwatch-observability"
+  addon_version               = null  # Use latest version
+  service_account_role_arn    = aws_iam_role.container_insights[0].arn
+  resolve_conflicts_on_create = "OVERWRITE"
+  resolve_conflicts_on_update = "OVERWRITE"
+  
+  configuration_values = jsonencode({
+    agent = {
+      config = {
+        logs = {
+          metrics_collected = {
+            application_signals = {}
+            kubernetes = {
+              enhanced_container_insights = true
+            }
+          }
+        }
+      }
+    }
+  })
+
+  depends_on = [
+    module.eks.eks_managed_node_groups,
+    aws_iam_role_policy_attachment.container_insights
+  ]
+
+  tags = var.tags
+}
+
+# IAM role for Container Insights
+resource "aws_iam_role" "container_insights" {
+  count = var.enable_container_insights ? 1 : 0
+  name  = "${var.cluster_name}-container-insights-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = module.eks.oidc_provider_arn
+        }
+        Condition = {
+          StringEquals = {
+            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:sub" = "system:serviceaccount:amazon-cloudwatch:cloudwatch-agent"
+            "${replace(module.eks.cluster_oidc_issuer_url, "https://", "")}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+
+  tags = var.tags
+}
+
+# Attach AWS managed policy for CloudWatch Agent
+resource "aws_iam_role_policy_attachment" "container_insights" {
+  count      = var.enable_container_insights ? 1 : 0
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  role       = aws_iam_role.container_insights[0].name
+}
+
 # Security group rule to allow ALB to reach worker nodes
 resource "aws_security_group_rule" "alb_to_nodes" {
   type                     = "ingress"

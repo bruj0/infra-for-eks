@@ -2,6 +2,8 @@
 
 This project creates a cost-optimized EKS cluster using OpenTofu with the AWS Load Balancer Controller for ingress.
 
+Repository: https://github.com/bruj0/infra-for-eks
+
 ## Cost Optimization Features
 
 - **Dual Availability Zone**: Minimum required for EKS (2 AZs)
@@ -10,6 +12,15 @@ This project creates a cost-optimized EKS cluster using OpenTofu with the AWS Lo
 - **Single NAT Gateway**: Shared across all private subnets
 - **Minimal Storage**: 20GB GP3 volumes
 - **Resource Limits**: Conservative CPU/memory allocation
+
+## Monitoring Features
+
+- **CloudWatch Container Insights**: Enhanced monitoring for EKS clusters
+  - Pod, node, and cluster-level metrics
+  - Application logs and performance insights
+  - Enhanced container insights with detailed resource utilization
+  - Integration with CloudWatch dashboards
+  - Can be disabled by setting `enable_container_insights = false`
 
 ## Prerequisites
 
@@ -78,6 +89,18 @@ To remove the backend resources and return to local state:
    kubectl get pods -A
    ```
 
+1. **Verify Container Insights (if enabled):**
+   ```bash
+   # Check if the CloudWatch addon is installed
+   aws eks describe-addon --cluster-name minimal-eks-cluster --addon-name amazon-cloudwatch-observability
+   
+   # Check CloudWatch agent pods
+   kubectl get pods -n amazon-cloudwatch
+   
+   # View Container Insights in AWS Console
+   # Navigate to CloudWatch → Container Insights → Performance monitoring
+   ```
+
 ## Application Deployment
 
 The configuration includes a sample application that demonstrates ALB ingress functionality. After deployment:
@@ -98,6 +121,9 @@ Expected monthly costs:
 - **NAT Gateway**: ~$32/month
 - **Application Load Balancer**: ~$16/month
 - **EBS Storage (20GB)**: ~$2/month
+- **CloudWatch Container Insights**: ~$2-5/month (depends on log volume and metrics)
 
-**Total estimated cost**: ~$128-130/month
+**Total estimated cost**: ~$130-135/month
+
+> **Note**: Container Insights adds minimal cost but provides significant value for monitoring and troubleshooting. You can disable it by setting `enable_container_insights = false` in your terraform.tfvars.
 

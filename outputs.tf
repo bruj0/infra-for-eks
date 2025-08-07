@@ -68,6 +68,16 @@ output "alb_security_group_id" {
   value       = aws_security_group.alb.id
 }
 
+output "container_insights_addon_arn" {
+  description = "Amazon Resource Name (ARN) of the EKS Container Insights addon"
+  value       = var.enable_container_insights ? aws_eks_addon.container_insights[0].arn : null
+}
+
+output "container_insights_enabled" {
+  description = "Whether Container Insights is enabled for the EKS cluster"
+  value       = var.enable_container_insights
+}
+
 # Commands to configure kubectl
 output "configure_kubectl" {
   description = "Configure kubectl: make sure you're logged in with the correct AWS profile and run the following command to update your kubeconfig"

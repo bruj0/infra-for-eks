@@ -18,6 +18,9 @@ node_desired_size = 1
 node_max_size = 2
 node_min_size = 1
 
+# Monitoring Configuration
+enable_container_insights = true  # Set to false to disable CloudWatch Container Insights
+
 # Tags
 tags = {
   Environment = "dev"
