@@ -2,8 +2,7 @@
 
 This project creates a cost-optimized EKS cluster using OpenTofu with the AWS Load Balancer Controller for ingress.
 
-Repository: https://github.com/bruj0/infra-for-eks
-
+To be used with CI/CD on this repo: https://github.com/bruj0/cicd-for-eks
 ## Cost Optimization Features
 
 - **Dual Availability Zone**: Minimum required for EKS (2 AZs)
